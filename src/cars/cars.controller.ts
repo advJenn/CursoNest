@@ -1,49 +1,54 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { CarsService } from './cars.service';
+import { CreateCarDto } from './dto/create-car.dto';
+import { UpdateCarDto } from './dto/update-car.dto';
 
 @Controller('cars')
+@UsePipes(ValidationPipe)
 export class CarsController {
+  constructor(private readonly carsService: CarsService) {}
 
-constructor(
-private readonly  carsService: CarsService
-){}
+  //----------EndPoints--------//
 
-//----------EndPoints--------//
+  @Get() //-> Decorador
+  getAllCars() {
+    return this.carsService.findAll();
+  }
 
+  @Get(':id')
+  getCarById(@Param('id', ParseUUIDPipe) id: string) {
+    //PIPES = Transforman la data recibida en varios lugares. Ejemplo: transformar un string a numero.
 
-@Get() //-> Decorador
-getAllCars() {
-    return this.carsService.findAll()
+    return this.carsService.findOneById(id);
+  }
+
+  @Post(':id')
+  createCar(@Body() createCarDto: CreateCarDto) {
+    return this.carsService.create(createCarDto);
+  }
+
+  @Patch(':id')
+  updateCar(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() UpdateCarDto: UpdateCarDto,
+  ) {
+    return this.carsService.update(id, UpdateCarDto);
+  }
+
+  @Delete(':id')
+  deleteCar(@Param('id', ParseUUIDPipe) id: string) {
+    return this.carsService.delete(id);
+  }
 }
-
-@Get(':id')
-getCarById( @Param ('id', ParseIntPipe) id: number){
-//PIPES = Transforman la data recibida en varios lugares. Ejemplo: transformar un string a numero.
-
-return this.carsService.findOneById(id);
-}
-
-@Post(':id')
-createCar( @Body() body: any) 
-{
-return body;
-}
-
-@Patch(':id')
-updateCar( @Body() body: any) 
-{
-return body;
-}
-
-@Patch(':id')
-deleteCar( @Param('id', ParseIntPipe) id: number){
-return{
-    method: 'delete',
-    id
-};
-}
-}
-
-
-
-
